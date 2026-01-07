@@ -6,12 +6,13 @@ from llama_index.core.postprocessor import MetadataReplacementPostProcessor
 # 导入 OpenAILike LLM (用于 DashScope 兼容模式，Qwen 模型)
 from llama_index.llms.openai_like import OpenAILike 
 # 导入 DashScopeEmbedding (用于阿里云 DashScope 嵌入模型)
+# from llama_index.embeddings.dashscope import DashScopeEmbedding 
 from llama_index.embeddings.google import GeminiEmbedding
 from llama_index.core import Document as LlamaDocument
 from src.extractor.pdf_extractor import PdfExtractor
+
 # 获取 API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 
 # 初始化 LlamaIndex 全局设置
 
@@ -27,9 +28,8 @@ Settings.llm = OpenAILike(
 # 2. 配置嵌入模型 (使用 DashScopeEmbedding 类)
 Settings.embed_model = GeminiEmbedding(
     model_name="models/embedding-001",  # Gemini 嵌入模型
-    api_key=GEMINI_API_KEY,
+    api_key=GEMINI_API_KEY,     
 )
-
 
 def evaluate_splitter(splitter, documents, question, splitter_name):
     """
@@ -77,7 +77,7 @@ def evaluate_splitter(splitter, documents, question, splitter_name):
     #     query_engine_params["node_postprocessors"] = [
     #         MetadataReplacementPostProcessor(target_metadata_key="window")
     #     ]
-    #     print("💡 检测到 Sentence Window 切片，已添加 MetadataReplacementPostProcessor。")
+    #     print("检测到 Sentence Window 切片，已添加 MetadataReplacementPostProcessor。")
     
     # query_engine = index.as_query_engine(**query_engine_params)
 
@@ -117,7 +117,6 @@ def evaluate_splitter(splitter, documents, question, splitter_name):
 
 # --- 示例文档和问题 ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# 构建test.pdf的绝对路径
 file_path = os.path.join(current_dir, "test.pdf")
 extractor = PdfExtractor(file_path = file_path,tenant_id = "1",user_id = "1")
 custom_documents = extractor.extract()
@@ -133,20 +132,11 @@ for doc in custom_documents:
 question = "LlamaIndex 的主要功能和核心概念是什么？以及两种高级切片策略的区别？"
 
 # --- 开始测试不同的切片策略 ---
-# token_splitter = TokenTextSplitter(
-#     chunk_size=30, # Small chunk size to demonstrate forced breaks
-#     chunk_overlap=0 # No overlap for clear distinct chunks
-# )
-# evaluate_splitter(token_splitter, documents, question, "Token 切片 (chunk_size=30)")
 
-# token_splitter = TokenTextSplitter(
-#     chunk_size=30, # Small chunk size to demonstrate forced breaks
-#     chunk_overlap=10 # No overlap for clear distinct chunks
-# )
-# evaluate_splitter(token_splitter, documents, question, "Token 切片 (chunk_size=30,chunk_overlap=10 )")
-
-sentence_splitter = SentenceSplitter(
-    chunk_size=512,
-    chunk_overlap=100
+# 句子窗口切片 (Sentence Window)
+sentence_window_splitter = SentenceWindowNodeParser.from_defaults(
+    window_size=3,
+    window_metadata_key="window",
+    original_text_metadata_key="original_text"
 )
-evaluate_splitter(sentence_splitter, documents, question, "Sentence")
+evaluate_splitter(sentence_window_splitter, documents, question, "Sentence Window")

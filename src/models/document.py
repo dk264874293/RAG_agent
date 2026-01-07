@@ -2,11 +2,12 @@
 Author: 汪培良 rick_wang@yunquna.com
 Date: 2026-01-05 08:26:44
 LastEditors: 汪培良 rick_wang@yunquna.com
-LastEditTime: 2026-01-06 07:24:34
+LastEditTime: 2026-01-07 17:50:30
 FilePath: /RAG_service/loader/models.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEcla
 '''
 from typing import Any
+import uuid
 from pydantic import BaseModel,Field
 
 class ChildDocument(BaseModel):
@@ -37,6 +38,7 @@ class AttachmentDocument(BaseModel):
 
 class Document(BaseModel):
     page_content:str
+    id_:str = Field(default_factory=lambda: str(uuid.uuid4()))
     vector: list[float] | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     provider:str | None = 'dify'
