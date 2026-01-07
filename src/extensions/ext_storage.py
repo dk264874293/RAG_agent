@@ -2,7 +2,7 @@
 Author: 汪培良 rick_wang@yunquna.com
 Date: 2026-01-06 07:20:39
 LastEditors: 汪培良 rick_wang@yunquna.com
-LastEditTime: 2026-01-06 13:06:14
+LastEditTime: 2026-01-06 21:38:01
 FilePath: /RAG_agent/src/extensions/ext_storage.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 '''
@@ -12,8 +12,8 @@ from collections.abc import Callable, Generator
 from typing import Literal, Union, overload
 
 from flask import Flask
-from extensions.storage.base_storage import BaseStorage
-from extensions.storage.storage_type import StorageType
+from .storage.base_storage import BaseStorage
+from .storage.storage_type import StorageType
 
 logger = logging.getLogger(__name__)
 

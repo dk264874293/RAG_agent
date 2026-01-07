@@ -7,7 +7,7 @@ import opendal
 from dotenv import dotenv_values
 from opendal import Operator
 
-from extensions.storage.base_storage import BaseStorage
+from .base_storage import BaseStorage
 
 logger = logging.getLogger(__name__)
 

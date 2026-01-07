@@ -2,7 +2,7 @@
 Author: 汪培良 rick_wang@yunquna.com
 Date: 2026-01-04 18:23:47
 LastEditors: 汪培良 rick_wang@yunquna.com
-LastEditTime: 2026-01-06 14:03:12
+LastEditTime: 2026-01-07 07:45:41
 FilePath: /RAG_service/loader/pdf_loader.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEi
 '''
@@ -12,16 +12,16 @@ import logging
 import uuid
 import os
 from collections.abc import Iterator
-from extractor.blob.blob import Blob
+from .blob.blob import Blob
 
 import pypdfium2
 import pypdfium2.raw as pdfium_c
 
-from extractor.extractor_base import BaseExtractor
-from models.document import Document
-from models.model import UploadFile
+from .extractor_base import BaseExtractor
+from ..models.document import Document
+from ..models.model import UploadFile
 
-from extensions.ext_storage import storage
+from ..extensions.ext_storage import storage
 
 logger = logging.getLogger(__name__)
 
