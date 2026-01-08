@@ -50,7 +50,9 @@ def evaluate_splitter(splitter, documents, question, splitter_name):
             # and indicate what its full window context would be.
             original_text = node.metadata.get("original_text", node.get_content())
             window_context = node.metadata.get("window", "N/A - 窗口内容未生成")
+            print(f"{'='*50}\n")
             print(f"   核心内容: \"{original_text}\"")
+            print(f"{'='*50}\n")
             print(f"   完整窗口上下文(供LLM用): \"{window_context}\"")
         else:
             print(f"   内容: \"{node.get_content()}\"")
