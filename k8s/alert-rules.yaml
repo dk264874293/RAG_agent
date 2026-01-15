@@ -1,0 +1,47 @@
+# Prometheus告警规则
+groups:
+  - name: rag_alerts
+    rules:
+      # 高延迟告警
+      - alert: HighRequestLatency
+        expr: rag_request_duration_seconds > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: rag-platform
+        annotations:
+          summary: "RAG系统请求延迟过高"
+          description: "接口的P95延迟为 {{ $value }}秒，超过5秒阈值"
+      
+      # 检索质量下降告警
+      - alert: LowRetrievalPrecision
+        expr: rag_retrieval_precision_at_k < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          team: rag-platform
+        annotations:
+          summary: "检索精度下降"
+          description: "检索精度下降到 {{ $value }}，低于0.7阈值"
+      
+      # LLM生成失败告警
+      - alert: LLMGenerationFailure
+        expr: rate(rag_errors_total{error_type="LLMError"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          team: rag-platform
+        annotations:
+          summary: "LLM生成失败率过高"
+          description: "LLM生成失败率为 {{ $value }}，超过10%阈值"
+      
+      # 缓存命中率低告警
+      - alert: LowCacheHitRate
+        expr: rag_cache_hit_rate < 0.6
+        for: 15m
+        labels:
+          severity: warning
+          team: rag-platform
+        annotations:
+          summary: "缓存命中率过低"
+          description: "缓存命中率下降到 {{ $value }}，低于60%阈值"

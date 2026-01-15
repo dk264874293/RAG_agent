@@ -22,15 +22,15 @@ import uuid
 from urllib.parse import urlparse
 #导入 Python 内置 XML 解析模块，用于解析 docx 中的超链接 XML 结构，提取 URL 地址
 from xml.etree import ElementTree
-
+import requests
 #导入 Python 内置 XML 解析模块，用于解析 docx 中的超链接 XML 结构，提取 URL 地址
 import httpx
 # 导入第三方 HTTP 请求库，用于发送网络请求（下载网络 docx 文件、外部图片）
 from docx import Document as DocxDocument
 
 
-from extractor.extractor_base import BaseExtractor
-from models.document import Document
+from .extractor_base import BaseExtractor
+from ..models.document import Document
 
 logger = logging.getLogger(__name__)
 

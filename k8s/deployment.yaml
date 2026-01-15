@@ -1,0 +1,152 @@
+# RAG系统Kubernetes部署配置
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-retrieval-service
+  namespace: rag-system
+  labels:
+    app: rag-retrieval
+    component: retrieval
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: rag-retrieval
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: rag-retrieval
+        version: v2.0.0
+    spec:
+      containers:
+      - name: retrieval-service
+        image: rag-system:2.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: VECTOR_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rag-config
+              key: vector_db_host
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rag-config
+              key: redis_host
+        - name: ELASTICSEARCH_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rag-config
+              key: es_host
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rag-secrets
+              key: openai_api_key
+        - name: DASHSCOPE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rag-secrets
+              key: dashscope_api_key
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/rag/config
+          readOnly: true
+        - name: data-volume
+          mountPath: /app/data
+      volumes:
+      - name: config-volume
+        configMap:
+          name: rag-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: rag-data-pvc
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - rag-retrieval
+              topologyKey: kubernetes.io/hostname
+---
+# 服务配置
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-retrieval-service
+  namespace: rag-system
+spec:
+  selector:
+    app: rag-retrieval
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  type: ClusterIP
+---
+# 水平自动伸缩配置
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rag-retrieval-hpa
+  namespace: rag-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rag-retrieval-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

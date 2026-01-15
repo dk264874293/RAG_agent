@@ -1,0 +1,25 @@
+# RAG系统ConfigMap配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-config
+  namespace: rag-system
+data:
+  # 数据库配置
+  vector_db_host: "chroma-service.rag-system.svc.cluster.local:8000"
+  redis_host: "redis-cluster.redis.svc.cluster.local:6379"
+  es_host: "elasticsearch.elasticsearch.svc.cluster.local:9200"
+  
+  # 模型配置
+  embedding_model: "text-embedding-3-large"
+  reranker_model: "BAAI/bge-reranker-large"
+  
+  # 业务配置
+  retrieval_top_k: "10"
+  max_context_length: "4000"
+  chunk_size: "1000"
+  chunk_overlap: "200"
+  
+  # 缓存配置
+  cache_ttl: "3600"
+  cache_max_size: "10000"
