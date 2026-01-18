@@ -1,0 +1,9 @@
+# OCR optional dependencies
+paddleocr>=2.7.0.3
+paddlepaddle>=2.5.0
+google-generativeai>=0.8.5
+dashscope>=1.19.0
+
+# Already in main requirements:
+# Pillow>=11.0.0
+# cachetools>=5.0.0

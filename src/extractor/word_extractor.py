@@ -34,7 +34,7 @@ from ..models.document import Document
 
 logger = logging.getLogger(__name__)
 
-class WorkExtractor(BaseExtractor):
+class WordExtractor(BaseExtractor):
     """
     加载docx文件。
     Args:

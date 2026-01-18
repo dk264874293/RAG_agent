@@ -17,5 +17,5 @@ class BaseExtractor(ABC):
     文档加载器实现的抽象接口。
     """
     @abstractmethod
-    def extract(self, doc: str) -> dict:
+    def extract(self) -> list:
         raise NotImplementedError
